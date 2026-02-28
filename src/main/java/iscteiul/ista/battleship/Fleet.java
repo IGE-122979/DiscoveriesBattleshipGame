@@ -1,16 +1,21 @@
-/**
- *
- */
 package iscteiul.ista.battleship;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Representa uma frota de navios no jogo Battleship.
+ * <p>
+ * Esta classe mantém uma lista de navios, permite adicionar navios,
+ * consultar navios por categoria ou posição e imprimir o estado da frota.
+ * </p>
+ */
 public class Fleet implements IFleet {
+
     /**
-     * This operation prints all the given ships
+     * Imprime todos os navios fornecidos na lista.
      *
-     * @param ships The list of ships
+     * @param ships Lista de navios a serem impressos
      */
     static void printShips(List<IShip> ships) {
         for (IShip ship : ships)
@@ -19,21 +24,32 @@ public class Fleet implements IFleet {
 
     // -----------------------------------------------------
 
+    /** Lista de navios da frota */
     private List<IShip> ships;
 
+    /**
+     * Construtor da frota. Inicializa a lista de navios.
+     */
     public Fleet() {
         ships = new ArrayList<>();
     }
 
+    /**
+     * Retorna todos os navios da frota.
+     *
+     * @return Lista de navios
+     */
     @Override
     public List<IShip> getShips() {
         return ships;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Adiciona um navio à frota se houver espaço, se estiver dentro do tabuleiro
+     * e se não houver risco de colisão com outros navios.
      *
-     * @see battleship.IFleet#addShip(battleship.IShip)
+     * @param s Navio a ser adicionado
+     * @return {@code true} se o navio foi adicionado, {@code false} caso contrário
      */
     @Override
     public boolean addShip(IShip s) {
@@ -45,10 +61,11 @@ public class Fleet implements IFleet {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Retorna todos os navios que pertencem a uma determinada categoria.
      *
-     * @see battleship.IFleet#getShipsLike(java.lang.String)
+     * @param category Categoria de navios (ex: "Galeao", "Fragata")
+     * @return Lista de navios da categoria especificada
      */
     @Override
     public List<IShip> getShipsLike(String category) {
@@ -60,10 +77,10 @@ public class Fleet implements IFleet {
         return shipsLike;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Retorna todos os navios que ainda estão flutuando (não foram totalmente afundados).
      *
-     * @see battleship.IFleet#getFloatingShips()
+     * @return Lista de navios ainda flutuantes
      */
     @Override
     public List<IShip> getFloatingShips() {
@@ -75,10 +92,11 @@ public class Fleet implements IFleet {
         return floatingShips;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Retorna o navio que ocupa uma determinada posição.
      *
-     * @see battleship.IFleet#shipAt(battleship.IPosition)
+     * @param pos Posição a ser verificada
+     * @return Navio que ocupa a posição ou {@code null} se não houver navio
      */
     @Override
     public IShip shipAt(IPosition pos) {
@@ -88,11 +106,23 @@ public class Fleet implements IFleet {
         return null;
     }
 
+    /**
+     * Verifica se um navio está totalmente dentro dos limites do tabuleiro.
+     *
+     * @param s Navio a ser verificado
+     * @return {@code true} se o navio está dentro do tabuleiro, {@code false} caso contrário
+     */
     private boolean isInsideBoard(IShip s) {
-        return (s.getLeftMostPos() >= 0 && s.getRightMostPos() <= BOARD_SIZE - 1 && s.getTopMostPos() >= 0
-                && s.getBottomMostPos() <= BOARD_SIZE - 1);
+        return (s.getLeftMostPos() >= 0 && s.getRightMostPos() <= BOARD_SIZE - 1 &&
+                s.getTopMostPos() >= 0 && s.getBottomMostPos() <= BOARD_SIZE - 1);
     }
 
+    /**
+     * Verifica se um navio está em risco de colisão com outros navios da frota.
+     *
+     * @param s Navio a ser verificado
+     * @return {@code true} se houver risco de colisão, {@code false} caso contrário
+     */
     private boolean colisionRisk(IShip s) {
         for (int i = 0; i < ships.size(); i++) {
             if (ships.get(i).tooCloseTo(s))
@@ -101,9 +131,9 @@ public class Fleet implements IFleet {
         return false;
     }
 
-
     /**
-     * This operation shows the state of a fleet
+     * Exibe o estado completo da frota, incluindo todos os navios, navios flutuantes
+     * e navios por categoria.
      */
     public void printStatus() {
         printAllShips();
@@ -116,10 +146,9 @@ public class Fleet implements IFleet {
     }
 
     /**
-     * This operation prints all the ships of a fleet belonging to a particular
-     * category
+     * Imprime todos os navios de uma categoria específica.
      *
-     * @param category The category of ships of interest
+     * @param category Categoria de navios
      */
     public void printShipsByCategory(String category) {
         assert category != null;
@@ -128,14 +157,14 @@ public class Fleet implements IFleet {
     }
 
     /**
-     * This operation prints all the ships of a fleet but not yet shot
+     * Imprime todos os navios que ainda estão flutuando.
      */
     public void printFloatingShips() {
         printShips(getFloatingShips());
     }
 
     /**
-     * This operation prints all the ships of a fleet
+     * Imprime todos os navios da frota.
      */
     void printAllShips() {
         printShips(ships);
