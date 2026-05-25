@@ -1,0 +1,17 @@
+{
+  "name": "DiscoveriesBattleshipGame Dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "ms-azuretools.vscode-docker",
+        "GitHub.vscode-github-actions",
+        "yzhang.markdown-all-in-one"
+      ]
+    }
+  },
+  "postCreateCommand": "mvn clean compile"
+}
