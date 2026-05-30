@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>iscteiul.ista</groupId>
@@ -9,31 +12,31 @@
 
   <name>Battleship</name>
   <description>A simple Battleship.</description>
-  <url>https://github.com/alopes-iul/Battleship</url>
+  <url>https://github.com/IGE-122979/DiscoveriesBattleshipGame</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.junit</groupId>
-        <artifactId>junit-bom</artifactId>
-        <version>5.10.0</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
+    <!-- JUnit antigo, necessário porque os testes usam junit.framework.TestCase -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- JUnit Jupiter, caso existam testes mais recentes no projeto -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
+      <version>6.0.0</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- Log4j Core -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
@@ -44,11 +47,21 @@
 
   <build>
     <plugins>
+      <!-- Compilador Java -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.14.1</version>
+        <configuration>
+          <release>17</release>
+        </configuration>
+      </plugin>
 
+      <!-- Cria um JAR executável com Main-Class e dependências incluídas -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>3.6.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -56,29 +69,54 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <mainClass>iscteiul.ista.App</mainClass>
                 </transformer>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
               </transformers>
             </configuration>
           </execution>
         </executions>
       </plugin>
 
+      <!-- Geração do site Maven para a pasta docs -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.3.0</version>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.21.0</version>
         <configuration>
-          <archive>
-            <manifest>
-              <mainClass>iscteiul.ista.App</mainClass>
-            </manifest>
-          </archive>
+          <outputDirectory>${project.basedir}/docs</outputDirectory>
+        </configuration>
+      </plugin>
+
+      <!-- Geração do Javadoc para docs/apidocs -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.12.0</version>
+        <configuration>
+          <outputDirectory>${project.basedir}/docs/apidocs</outputDirectory>
         </configuration>
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <outputDirectory>${project.basedir}/docs</outputDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.9.0</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.12.0</version>
+      </plugin>
+    </plugins>
+  </reporting>
+
 </project>
