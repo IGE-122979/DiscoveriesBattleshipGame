@@ -1,0 +1,199 @@
+name: Complete CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "docs/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  complete-workflow:
+    name: Complete CI/CD
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: Verify dependencies
+        run: mvn dependency:tree
+
+      - name: Compile project
+        run: mvn clean compile
+
+      - name: Run unit tests
+        run: mvn test
+
+      - name: SonarQube Cloud analysis and Quality Gate
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }} \
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.qualitygate.wait=true
+
+      - name: Package application
+        run: mvn clean package -DskipTests
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and publish Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/battleship-game:latest
+
+      - name: Generate Maven site
+        run: mvn site
+
+      - name: Generate Javadoc
+        run: mvn javadoc:javadoc
+
+      - name: Create custom GitHub Pages index
+        run: |
+          mkdir -p docs
+          cat > docs/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html lang="pt">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Discoveries Battleship Game</title>
+            <style>
+              body {
+                margin: 0;
+                font-family: Arial, Helvetica, sans-serif;
+                background: #f4f7fb;
+                color: #1f2937;
+                line-height: 1.6;
+              }
+
+              header {
+                background: linear-gradient(135deg, #0f172a, #1d4ed8);
+                color: white;
+                padding: 60px 20px;
+                text-align: center;
+              }
+
+              header h1 {
+                margin: 0;
+                font-size: 42px;
+              }
+
+              header p {
+                margin-top: 12px;
+                font-size: 18px;
+              }
+
+              main {
+                max-width: 1000px;
+                margin: 30px auto;
+                padding: 0 20px;
+              }
+
+              .card {
+                background: white;
+                border-radius: 14px;
+                padding: 24px;
+                margin-bottom: 20px;
+                box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+              }
+
+              h2 {
+                color: #1d4ed8;
+              }
+
+              .links {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 16px;
+              }
+
+              a {
+                color: #1d4ed8;
+                font-weight: bold;
+                text-decoration: none;
+              }
+
+              .button {
+                display: block;
+                padding: 16px;
+                border-radius: 12px;
+                background: #e0ecff;
+                text-align: center;
+              }
+
+              footer {
+                text-align: center;
+                padding: 30px;
+                color: #6b7280;
+              }
+            </style>
+          </head>
+          <body>
+            <header>
+              <h1>Discoveries Battleship Game</h1>
+              <p>Projeto de Engenharia de Software com Maven, Docker, Dev Containers, SonarQube Cloud e GitHub Actions</p>
+            </header>
+
+            <main>
+              <section class="card">
+                <h2>Sobre o projeto</h2>
+                <p>
+                  Este projeto implementa uma versão do jogo Batalha Naval inspirada no período dos Descobrimentos.
+                  O objetivo é aplicar práticas modernas de Engenharia de Software, incluindo automação de build,
+                  testes, análise de qualidade, contentores Docker e documentação automática.
+                </p>
+              </section>
+
+              <section class="card">
+                <h2>Documentação</h2>
+                <div class="links">
+                  <a class="button" href="apidocs/">Javadoc / API Docs</a>
+                  <a class="button" href="project-info.html">Informação Maven</a>
+                  <a class="button" href="dependencies.html">Dependências</a>
+                </div>
+              </section>
+
+              <section class="card">
+                <h2>Pipeline CI/CD</h2>
+                <p>
+                  A pipeline executa checkout do código, verificação de dependências, compilação,
+                  testes unitários, validação de qualidade no SonarQube Cloud, construção e publicação
+                  da imagem Docker no Docker Hub e atualização da documentação no GitHub Pages.
+                </p>
+              </section>
+            </main>
+
+            <footer>
+              <p>Engenharia de Software — ISCTE</p>
+            </footer>
+          </body>
+          </html>
+          EOF
+
+      - name: Commit updated documentation
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update generated documentation [skip ci]"
+          file_pattern: docs
