@@ -34,9 +34,7 @@
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
-    git add pom.xml
-    git commit -m "Resolve merge conflict in pom.xml"
-    git push origin main<dependency>
+    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
       <version>2.25.2</version>
