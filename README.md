@@ -43,4 +43,8 @@
 - [Caravela](https://pt.wikipedia.org/wiki/Caravela)
 - [Nau](https://pt.wikipedia.org/wiki/Nau)
 
+## Contribuição Individual
+
+Este README foi atualizado por João Gonçalves.
+
 Basic academic version of Battleship game to build upon.

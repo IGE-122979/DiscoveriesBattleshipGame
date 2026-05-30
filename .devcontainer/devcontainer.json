@@ -1,17 +1,23 @@
 {
-  "name": "DiscoveriesBattleshipGame Dev",
+  "name": "Discoveries Battleship Dev Container",
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile",
+    "context": ".."
   },
+  "remoteUser": "vscode",
+  "workspaceFolder": "/workspaces/DiscoveriesBattleshipGame",
   "customizations": {
+    "jetbrains": {
+      "backend": "IntelliJ"
+    },
     "vscode": {
       "extensions": [
         "vscjava.vscode-java-pack",
+        "vscjava.vscode-maven",
         "ms-azuretools.vscode-docker",
-        "GitHub.vscode-github-actions",
+        "github.vscode-github-actions",
         "yzhang.markdown-all-in-one"
       ]
     }
-  },
-  "postCreateCommand": "mvn clean compile"
+  }
 }

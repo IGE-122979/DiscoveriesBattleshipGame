@@ -1,2 +1,7 @@
-FROM eclipse-temurin:17-jdk
-RUN apt-get update && apt-get install -y git maven
+FROM maven:3.9.9-eclipse-temurin-21
+
+RUN useradd -m -s /bin/bash vscode \
+    && mkdir -p /workspaces \
+    && chown -R vscode:vscode /workspaces
+
+WORKDIR /workspaces/DiscoveriesBattleshipGame
